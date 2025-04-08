@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign Up</title>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1485.0.min.js"></script>
+</head>
+<body>
+  <h2>Sign Up</h2>
+  <form id="signup-form">
+    <label>Email: <input type="email" id="email" required></label><br><br>
+    <label>Password: <input type="password" id="password" required></label><br><br>
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <script>
+    AWS.config.region = 'us-east-1'; // e.g. us-east-1
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: 'us-east-1:78cb77af-91bf-4d37-aac2-6c327f8ab88b'
+    });
+
+    const poolData = {
+      UserPoolId: 'us-east-1_ntg4MuBtW',
+      ClientId: '32q03q0tugod7td618vj2ti97l'
+    };
+
+    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+    document.getElementById('signup-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const attributeList = [];
+      const dataEmail = {
+        Name: 'email',
+        Value: email
+      };
+
+      const attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
+      attributeList.push(attributeEmail);
+
+      userPool.signUp(email, password, attributeList, null, function (err, result) {
+        if (err) {
+          alert(err.message || JSON.stringify(err));
+          return;
+        }
+        alert('Sign up successful! Please check your email to confirm.');
+        console.log(result);
+      });
+    });
+  </script>
+
+  <!-- Cognito JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.2.0/dist/amazon-cognito-identity.min.js"></script>
+</body>
+</html>
